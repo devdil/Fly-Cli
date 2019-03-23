@@ -37,7 +37,8 @@ token_ibibocommand_map = {
 
 filters = ['with_airline', 'non_stop']
 
-Options = WordCompleter([u'fly', u'from', u'to', u'on', u'with_airline', u'non_stop', u'order_by']\
+Options = WordCompleter([u'fly', u'from', u'to', u'on', u'with_airline', u'non_stop', u'order_by', u'adults',\
+                         u'children', u'adults']\
                         + map(lambda x: unicode(x, 'utf-8'), cities.keys()) +\
                          map(lambda x: unicode(x, 'utf-8'), airlines.keys()), ignore_case=True)
 
@@ -80,7 +81,7 @@ def construct_request_url(**kwargs):
 
         api_url = 'http://developer.goibibo.com/api/search/?app_id=61eb1b22&app_key=34b01b047ae88ae6e924855f5c0a522d&format=json' \
                   '&source={source}&destination={destination}&dateofdeparture={departure}&seatingclass=E&adults={adults}&children={children}&infants={infants}&counter=100'.format(**final_kwargs)
-
+        
         return api_url
 
     else:
@@ -119,20 +120,27 @@ def process_input(input_string):
 
 
 def prettyPrint(data):
-    column_titles = ["Airline", "Seats Available", "Duration", "Stops", "Departure Date", "Arrival Date", "Booking Class", "Refundable"]
+    column_titles = ["Airline", "Seats Available", "Duration", "Fare", "Stops", "Departure Date", "Arrival Date", "Booking Class", "Refundable"]
 
     total_characters_in_column_titles = reduce(lambda x, y: +x+y , map(lambda x : len(x), column_titles))
 
     row_items = []
 
-    columns_interested = ['airline', 'seatsavailable', 'duration', 'stops', 'depdate', 'arrdate', 'bookingclass', 'warnings']
+    columns_interested = ['airline', 'seatsavailable', 'duration', 'fare', 'stops', 'depdate', 'arrdate', 'bookingclass', 'warnings']
+    nested_keys_interested = ["fare"]
+
     max_length_per_column = []
 
     for item in data:
 
         row_item = []
         for index in xrange(len(columns_interested)):
-            row_item.append(item[columns_interested[index]])
+            if columns_interested[index]  in nested_keys_interested:
+                nested_key = columns_interested[index]
+                if nested_key == "fare":
+                    row_item.append(str(item[nested_key]['totalfare']))
+            else:
+                row_item.append(item[columns_interested[index]])
             if max_length_per_column:
                 max_length_per_column[index] = (max(len(item[columns_interested[index]]), (max_length_per_column[index])))
 

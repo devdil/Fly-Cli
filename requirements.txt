@@ -5,5 +5,5 @@ idna==2.8
 prompt-toolkit==2.0.9
 requests==2.21.0
 six==1.12.0
-urllib3==1.24.1
+urllib3==1.24.2
 wcwidth==0.1.7
